@@ -13,10 +13,14 @@ parser = argparse.ArgumentParser(description='TransE model')
 parser.add_argument("--experiment_name", type=str, default="default",
                     help="A folder with this name would be created to dump saved models and log files")
 
-parser.add_argument("--nEpochs", type=int, default=5,
+parser.add_argument("--nEpochs", type=int, default=1000,
                     help="Learning rate of the optimizer")
-parser.add_argument("--nBatches", type=int, default=10,
+parser.add_argument("--nBatches", type=int, default=200,
                     help="Batch size")
+parser.add_argument("--eval_every", type=int, default=25,
+                    help="Interval of epochs to evaluate the model?")
+parser.add_argument("--save_every", type=int, default=50,
+                    help="Interval of epochs to save a checkpoint of the model?")
 
 parser.add_argument("--sample_size", type=int, default=30,
                     help="No. of negative samples to compare to for MRR/MR/Hit@10")
@@ -33,12 +37,7 @@ parser.add_argument("--embedding_dim", type=int, default=100,
 parser.add_argument("--lr", type=int, default=0.1,
                     help="Learning rate of theoptimizer")
 
-parser.add_argument("--eval_every", type=int, default=2,
-                    help="Interval of epochs to evaluate the model?")
-parser.add_argument("--save_every", type=int, default=2,
-                    help="Interval of epochs to save a checkpoint of the model?")
-
-parser.add_argument("--debug", type=bool_flag, default=True,
+parser.add_argument("--debug", type=bool_flag, default=False,
                     help="Run the code in debug mode?")
 
 params = parser.parse_args()
