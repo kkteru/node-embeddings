@@ -1,12 +1,18 @@
 import os
 import argparse
+import json
+import logging
 
-from roles import *
-from models import *
-from utils import bool_flag
+from core import *
+from managers import *
+from utils import *
+
+logging.basicConfig(level=logging.INFO)
 
 parser = argparse.ArgumentParser(description='TransE model')
 
+parser.add_argument("--experiment_name", type=str, default="default",
+                    help="A folder with this name would be created to dump saved models and log files")
 parser.add_argument("--optimizer", type=str, default="SGD",
                     help="Which optimizer to use?")
 parser.add_argument("--nBatches", type=int, default=10,
@@ -32,10 +38,7 @@ parser.add_argument("--debug", type=bool_flag, default=True,
 
 params = parser.parse_args()
 
-
-DATA_PATH = os.path.join(os.path.dirname(__file__), 'data/FB15K237')
-TRAIN_DATA_PATH = os.path.join(DATA_PATH, 'train2id.txt')
-VALID_DATA_PATH = os.path.join(DATA_PATH, 'valid2id.txt')
+initialize_experiment(params)
 
 train_data_sampler = DataSampler(TRAIN_DATA_PATH, params.debug)
 valid_data_sampler = DataSampler(VALID_DATA_PATH)
@@ -45,17 +48,16 @@ evaluator = Evaluator(transE, valid_data_sampler, params.sample_size)
 
 batch_size = int(len(train_data_sampler.data) / params.nBatches)
 
-print('Batch size = %d' % batch_size)
+logging.info('Batch size = %d' % batch_size)
 
 for e in range(params.nEpochs):
-    print('Running epoch %d' % e)
+    logging.info('Running epoch %d' % e)
     for b in range(params.nBatches):
-        # print('Running batch %d' % b)
         trainer.one_step(batch_size)
 
     if (e + 1) % params.eval_every == 0:
         log_data = evaluator.get_log_data()
-        print(log_data)
+        logging.info('Performance:' + str(log_data))
         to_continue = trainer.select_model(log_data)
         if not to_continue:
             break
