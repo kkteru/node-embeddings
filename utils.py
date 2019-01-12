@@ -2,6 +2,8 @@ import os
 import argparse
 import logging
 import json
+import torch
+from core import TransE
 
 FALSY_STRINGS = {'off', 'false', '0'}
 TRUTHY_STRINGS = {'on', 'true', '1'}
@@ -42,3 +44,15 @@ def initialize_experiment(params):
 
     with open(os.path.join(params.exp_dir, "params.json"), 'w') as fout:
         json.dump(vars(params), fout)
+
+
+def initialize_model(params):
+
+    if os.path.exists(os.path.join(params.exp_dir, 'best_model.pth')):
+        logging.info('Loading existing model from %s' % os.path.join(params.exp_dir, 'best_model.pth'))
+        model = torch.load(os.path.join(params.exp_dir, 'best_model.pth'))
+    else:
+        logging.info('No existing model found. Initializing new model..')
+        model = TransE(params)
+
+    return model

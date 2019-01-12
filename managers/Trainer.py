@@ -35,6 +35,6 @@ class Trainer():
         else:
             self.bad_count = self.bad_count + 1
             if self.bad_count > self.params.patience:
-                logging.info('Out of patience. Stoppong the training loop.')
+                logging.info('Out of patience. Stopping the training loop.')
                 return False
         return True

@@ -13,7 +13,7 @@ class DataSampler():
         self.ent = self.get_ent(self.data)  # Fill this
         self.rel = self.get_rel(self.data)  # Fill this
 
-        logging.info('Loaded data sucessfully. Samples = %d \n Total entities = %d \n Total relations = %d' % (len(self.data), len(self.ent), len(self.rel)))
+        logging.info('Loaded data sucessfully from %s. Samples = %d; Total entities = %d; Total relations = %d' % (file_path, len(self.data), len(self.ent), len(self.rel)))
 
     def get_ent(self, debug=False):
         return set([i.item() for i in self.data[:, 0:2].reshape(-1)])
