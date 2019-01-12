@@ -8,3 +8,4 @@ Todo list
 - [ ] Use tensorboard to visualize the results
 
 - [ ] Refactor into managers and doers. All the computation in doears and orchestration in managers.
+- [ ] Tune the performance
