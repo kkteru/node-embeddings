@@ -55,12 +55,11 @@ batch_size = int(len(train_data_sampler.data) / params.nBatches)
 logging.info('Batch size = %d' % batch_size)
 
 for e in range(params.nEpochs):
-    logging.info('Running epoch %d' % e)
     for b in range(params.nBatches):
         trainer.one_step(batch_size)
 
-    logging.info('Entity embeddings mean : %d, Entity embeddings mean : %d'
-                 % (torch.mean(torch.norm(transE.ent_embeddings.weight.data, dim=-1)), torch.mean(torch.norm(transE.rel_embeddings.weight.data, dim=-1))))
+    logging.info('Epoch %d, Entity embeddings mean : %f, Relations embeddings mean : %f'
+                 % (e, torch.mean(torch.norm(transE.ent_embeddings.weight.data, dim=-1)), torch.mean(torch.norm(transE.rel_embeddings.weight.data, dim=-1))))
 
     if (e + 1) % params.eval_every == 0:
         log_data = evaluator.get_log_data()
