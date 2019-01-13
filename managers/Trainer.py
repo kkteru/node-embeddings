@@ -15,6 +15,7 @@ class Trainer():
             self.optimizer = optim.SGD(self.model.parameters(), lr=params.lr)
 
         self.best_mrr = 0
+        self.last_mrr = 0
         self.bad_count = 0
 
         assert self.optimizer != None
@@ -29,11 +30,14 @@ class Trainer():
         return loss
 
     def select_model(self, log_data):
-        if log_data['mrr'] > self.best_mrr:
+        if log_data['mrr'] > self.last_mrr:
+            self.last_mrr = log_data['mrr']
             self.bad_count = 0
-            torch.save(self.model, os.path.join(self.params.exp_dir, 'best_model.pth'))  # Does it overwrite or fuck with the existing file?
-            logging.info('Better model found w.r.t MRR. Saved it!')
-            self.best_mrr = log_data['mrr']
+
+            if log_data['mrr'] > self.best_mrr:
+                torch.save(self.model, os.path.join(self.params.exp_dir, 'best_model.pth'))  # Does it overwrite or fuck with the existing file?
+                logging.info('Better model found w.r.t MRR. Saved it!')
+                self.best_mrr = log_data['mrr']
         else:
             self.bad_count = self.bad_count + 1
             if self.bad_count > self.params.patience:
