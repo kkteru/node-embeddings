@@ -11,3 +11,4 @@ Todo list
 
 - [x] Refactor into managers and core. Managers have access to core members and use them to get results.
 - [ ] Tune the performance
+- [ ] Port it to optimize on GPUs
