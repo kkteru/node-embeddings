@@ -58,7 +58,7 @@ for e in range(params.nEpochs):
     for b in range(params.nBatches):
         trainer.one_step(batch_size)
 
-    logging.info('Epoch %d, Entity embeddings mean : %f, Relations embeddings mean : %f'
+    logging.info('Epoch %d, Entity embeddings mean norm : %f, Relations embeddings mean norm : %f'
                  % (e, torch.mean(torch.norm(transE.ent_embeddings.weight.data, dim=-1)), torch.mean(torch.norm(transE.rel_embeddings.weight.data, dim=-1))))
 
     if (e + 1) % params.eval_every == 0:
