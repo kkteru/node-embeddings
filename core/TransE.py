@@ -11,7 +11,7 @@ class TransE(nn.Module):
     def __init__(self, params):
         super(TransE, self).__init__()
         self.params = params
-        self.ent_embeddings = nn.Embedding(TOTAL_ENTITIES, self.params.embedding_dim)
+        self.ent_embeddings = nn.Embedding(TOTAL_ENTITIES, self.params.embedding_dim, max_norm=1)
         self.rel_embeddings = nn.Embedding(TOTAL_RELATIONS, self.params.embedding_dim)
         self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')
 
