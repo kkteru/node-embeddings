@@ -12,7 +12,7 @@ class Trainer():
         self.params = params
 
         if params.optimizer == "SGD":
-            self.optimizer = optim.SGD(self.model.parameters(), lr=params.lr)
+            self.optimizer = optim.SGD(self.model.parameters(), lr=params.lr, momentum=params.momentum)
 
         self.best_mrr = 0
         self.last_mrr = 0

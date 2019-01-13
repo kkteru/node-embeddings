@@ -36,7 +36,9 @@ parser.add_argument("--optimizer", type=str, default="SGD",
 parser.add_argument("--embedding_dim", type=int, default=100,
                     help="Entity and relations embedding size")
 parser.add_argument("--lr", type=int, default=0.1,
-                    help="Learning rate of theoptimizer")
+                    help="Learning rate of the optimizer")
+parser.add_argument("--momentum", type=int, default=0.9,
+                    help="Momentum of the SGD optimizer")
 
 parser.add_argument("--debug", type=bool_flag, default=False,
                     help="Run the code in debug mode?")
