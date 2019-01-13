@@ -1,5 +1,6 @@
 import argparse
 import logging
+import time
 
 from core import *
 from managers import *
@@ -52,14 +53,16 @@ evaluator = Evaluator(transE, valid_data_sampler, params.sample_size)
 
 batch_size = int(len(train_data_sampler.data) / params.nBatches)
 
-logging.info('Batch size = %d' % batch_size)
+logging.info('Starting training with batch size = %d' % batch_size)
 
 for e in range(params.nEpochs):
+    tic = time.time()
     for b in range(params.nBatches):
         loss = trainer.one_step(batch_size)
+    toc = time.time()
 
-    logging.info('Epoch %d, Loss: %f Entity embeddings mean norm : %f, Relations embeddings mean norm : %f'
-                 % (e, loss, torch.mean(torch.norm(transE.ent_embeddings.weight.data, dim=-1)), torch.mean(torch.norm(transE.rel_embeddings.weight.data, dim=-1))))
+    logging.info('Epoch %d with loss: %f in %f'
+                 % (e, loss, toc - tic))
 
     if (e + 1) % params.eval_every == 0:
         log_data = evaluator.get_log_data()

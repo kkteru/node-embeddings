@@ -42,6 +42,11 @@ def initialize_experiment(params):
     logger = logging.getLogger()
     logger.addHandler(file_handler)
 
+    logger.info('============ Initialized logger ============')
+    logger.info('\n'.join('%s: %s' % (k, str(v)) for k, v
+                          in sorted(dict(vars(params)).items())))
+    logger.info('============================================')
+
     with open(os.path.join(params.exp_dir, "params.json"), 'w') as fout:
         json.dump(vars(params), fout)
 
