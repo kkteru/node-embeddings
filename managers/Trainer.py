@@ -26,6 +26,8 @@ class Trainer():
         loss.backward()
         self.optimizer.step()
 
+        return loss
+
     def select_model(self, log_data):
         if log_data['mrr'] > self.best_mrr:
             self.bad_count = 0

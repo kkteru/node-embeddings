@@ -39,7 +39,7 @@ class TransE(nn.Module):
     def forward(self, batch_h, batch_t, batch_r):
         h = self.ent_embeddings(torch.from_numpy(batch_h))
         t = self.ent_embeddings(torch.from_numpy(batch_t))
-        r = self.ent_embeddings(torch.from_numpy(batch_r))
+        r = self.rel_embeddings(torch.from_numpy(batch_r))
 
         score = self.get_score(h, t, r)
 

@@ -32,8 +32,9 @@ class DataSampler():
         return batch[:, 0], batch[:, 1], batch[:, 2]
 
     def _sample_negative(self, sample):
-        sample[0] = self.data[np.random.randint(0, len(self.data)), 0]
-        return sample
+        neg_sample = np.array(sample)
+        neg_sample[0] = self.data[np.random.randint(0, len(self.data)), 0]
+        return neg_sample
 
     def get_negative_batch(self, batch):
         neg_batch = np.zeros(batch.shape, dtype=np.int64)
