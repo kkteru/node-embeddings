@@ -29,11 +29,11 @@ parser.add_argument("--patience", type=int, default=10,
                     help="Early stopping patience")
 parser.add_argument("--margin", type=int, default=1,
                     help="The margin between positive and negative samples in the max-margin loss")
-parser.add_argument("--p_norm", type=int, default=2,
+parser.add_argument("--p_norm", type=int, default=1,
                     help="The norm to use for the distance metric")
 parser.add_argument("--optimizer", type=str, default="SGD",
                     help="Which optimizer to use?")
-parser.add_argument("--embedding_dim", type=int, default=100,
+parser.add_argument("--embedding_dim", type=int, default=50,
                     help="Entity and relations embedding size")
 parser.add_argument("--lr", type=float, default=0.1,
                     help="Learning rate of the optimizer")
@@ -73,8 +73,10 @@ for e in range(params.nEpochs):
     if (e + 1) % params.eval_every == 0:
         log_data = evaluator.get_log_data()
         logging.info('Performance:' + str(log_data))
-        for tag, value in log_data:
+
+        for tag, value in log_data.items():
             tb_logger.scalar_summary(tag, value, e + 1)
+
         to_continue = trainer.select_model(log_data)
         if not to_continue:
             break
