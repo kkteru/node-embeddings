@@ -31,7 +31,6 @@ class Trainer():
 
     def select_model(self, log_data):
         if log_data['mrr'] > self.last_mrr:
-            self.last_mrr = log_data['mrr']
             self.bad_count = 0
 
             if log_data['mrr'] > self.best_mrr:
@@ -43,4 +42,5 @@ class Trainer():
             if self.bad_count > self.params.patience:
                 logging.info('Out of patience. Stopping the training loop.')
                 return False
+        self.last_mrr = log_data['mrr']
         return True
