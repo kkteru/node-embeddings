@@ -57,11 +57,15 @@ batch_size = int(len(train_data_sampler.data) / params.nBatches)
 
 logging.info('Starting training with batch size = %d' % batch_size)
 
+tb_logger = Logger(params.exp_dir)
+
 for e in range(params.nEpochs):
     tic = time.time()
     for b in range(params.nBatches):
         loss = trainer.one_step(batch_size)
     toc = time.time()
+
+    tb_logger.scalar_summary('loss', loss, e)
 
     logging.info('Epoch %d with loss: %f in %f'
                  % (e, loss, toc - tic))
@@ -69,6 +73,8 @@ for e in range(params.nEpochs):
     if (e + 1) % params.eval_every == 0:
         log_data = evaluator.get_log_data()
         logging.info('Performance:' + str(log_data))
+        for tag, value in log_data:
+            tb_logger.scalar_summary(tag, value, e + 1)
         to_continue = trainer.select_model(log_data)
         if not to_continue:
             break
