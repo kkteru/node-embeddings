@@ -2,6 +2,7 @@ import os
 import logging
 import torch
 import torch.optim as optim
+import torch.nn as nn
 
 
 class Trainer():
@@ -20,7 +21,7 @@ class Trainer():
         self.last_mrr = 0
         self.bad_count = 0
 
-        assert self.optimizer != None
+        assert self.optimizer is not None
 
     def one_step(self, batch_size):  # rename
         batch_h, batch_t, batch_r = self.data.get_batch(batch_size)
