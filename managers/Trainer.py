@@ -14,6 +14,8 @@ class Trainer():
         if params.optimizer == "SGD":
             self.optimizer = optim.SGD(self.model.parameters(), lr=params.lr, momentum=params.momentum)
 
+        self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')
+
         self.best_mrr = 0
         self.last_mrr = 0
         self.bad_count = 0
@@ -22,7 +24,12 @@ class Trainer():
 
     def one_step(self, batch_size):  # rename
         batch_h, batch_t, batch_r = self.data.get_batch(batch_size)
-        loss = self.model(batch_h, batch_t, batch_r)
+        score = self.model(batch_h, batch_t, batch_r)
+
+        pos_score = score[0: int(len(score) / 2)]
+        neg_score = score[int(len(score) / 2): len(score)]
+
+        loss = self.criterion(pos_score, neg_score, torch.Tensor([-1]))
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()

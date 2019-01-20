@@ -69,6 +69,8 @@ def initialize_model(params):
     return model
 
 # Code referenced from https://gist.github.com/gyglim/1f8dfb1b5c82627ae3efcfbbadb9f514
+
+
 class Logger(object):
 
     def __init__(self, log_dir):

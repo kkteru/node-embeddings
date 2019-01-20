@@ -16,7 +16,7 @@ class Evaluator():
 
         heads = self.model.ent_embeddings(torch.LongTensor(head_ids))
         tails = self.model.ent_embeddings(torch.LongTensor([sample[1]] * len(head_ids)))
-        rels = self.model.ent_embeddings(torch.LongTensor([sample[2]] * len(head_ids)))
+        rels = self.model.rel_embeddings(torch.LongTensor([sample[2]] * len(head_ids)))
 
         scores = self.model.get_score(heads, tails, rels)
 
