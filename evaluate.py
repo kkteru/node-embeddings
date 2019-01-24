@@ -1,18 +1,16 @@
 import argparse
 import logging
-import time
 
 from core import *
 from managers import *
 from utils import *
-import torch
 
 logging.basicConfig(level=logging.INFO)
 
 parser = argparse.ArgumentParser(description='TransE model')
 
 parser.add_argument("--experiment_name", type=str, default="default",
-                    help="A folder with this name would be created to dump saved models and log files")
+                    help="Experiment folder to load model from")
 
 parser.add_argument("--nEpochs", type=int, default=1000,
                     help="Learning rate of the optimizer")
@@ -45,7 +43,8 @@ parser.add_argument("--debug", type=bool_flag, default=False,
 
 params = parser.parse_args()
 
-initialize_experiment(params)
+exps_dir = os.path.join(MAIN_DIR, 'experiments')
+params.exp_dir = os.path.join(exps_dir, params.experiment_name)
 
 test_data_sampler = DataSampler(TEST_DATA_PATH)
 transE = initialize_model(params)
