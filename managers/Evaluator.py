@@ -3,10 +3,10 @@ import torch
 
 
 class Evaluator():
-    def __init__(self, model, data_sampler, sample_size):
+    def __init__(self, model, data_sampler, sample_size=0):
         self.model = model
         self.data_sampler = data_sampler
-        self.sample_size = sample_size
+        self.sample_size = sample_size if sample_size != 0 else len(data_sampler.data)
 
     def _rank(self, sample):
         idx = np.random.random_integers(0, len(self.data_sampler.ent) - 1, self.sample_size)
