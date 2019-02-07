@@ -17,7 +17,7 @@ parser.add_argument("--p_norm", type=int, default=1,
                     help="The norm to use for the distance metric")
 parser.add_argument("--embedding_dim", type=int, default=50,
                     help="Entity and relations embedding size")
-parser.add_argument("--neg_sample_size", type=int, default=30,
+parser.add_argument("--neg_sample_size", type=int, default=100,
                     help="No. of negative samples to compare to for MRR/MR/Hit@10")
 parser.add_argument('--disable-cuda', action='store_true',
                     help='Disable CUDA')
@@ -43,5 +43,9 @@ evaluator = Evaluator(transE, test_data_sampler, params.neg_sample_size)
 
 logging.info('Testing model %s' % os.path.join(params.exp_dir, 'best_model.pth'))
 
+
+tic = time.time()
 log_data = evaluator.get_log_data()
-logging.info('Test performance:' + str(log_data))
+toc = time.time()
+
+logging.info('Test performance: %s in %f' % (str(log_data), toc - tic))
