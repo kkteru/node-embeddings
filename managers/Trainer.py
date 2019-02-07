@@ -30,7 +30,7 @@ class Trainer():
         pos_score = score[0: int(len(score) / 2)]
         neg_score = score[int(len(score) / 2): len(score)]
 
-        loss = self.criterion(pos_score, neg_score, torch.Tensor([-1]))
+        loss = self.criterion(pos_score, neg_score, torch.Tensor([-1]).to(device=self.params.device))
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()

@@ -26,8 +26,8 @@ class TransE(nn.Module):
         return torch.norm(h + r - t, self.params.p_norm, -1)
 
     def forward(self, batch_h, batch_t, batch_r):
-        h = self.ent_embeddings(torch.from_numpy(batch_h))
-        t = self.ent_embeddings(torch.from_numpy(batch_t))
-        r = self.rel_embeddings(torch.from_numpy(batch_r))
+        h = self.ent_embeddings(torch.from_numpy(batch_h).to(device=self.params.device))
+        t = self.ent_embeddings(torch.from_numpy(batch_t).to(device=self.params.device))
+        r = self.rel_embeddings(torch.from_numpy(batch_r).to(device=self.params.device))
 
         return self.get_score(h, t, r)
