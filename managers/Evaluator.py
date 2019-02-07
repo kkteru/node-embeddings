@@ -22,7 +22,7 @@ class Evaluator():
 
         assert scores.shape == (len(head_ids), )
 
-        return np.where(head_ids[scores.argsort()] == sample[0])[0][0] + 1
+        return np.where(head_ids[scores.argsort().cpu()] == sample[0])[0][0] + 1
 
     def get_log_data(self):
         ranks = np.array(list(map(self._rank, self.data_sampler.data)))
