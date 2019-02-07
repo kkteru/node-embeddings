@@ -23,7 +23,7 @@ parser.add_argument("--eval_every", type=int, default=25,
 parser.add_argument("--save_every", type=int, default=50,
                     help="Interval of epochs to save a checkpoint of the model?")
 
-parser.add_argument("--sample_size", type=int, default=30,
+parser.add_argument("--sample_size", type=int, default=100,
                     help="No. of negative samples to compare to for MRR/MR/Hit@10")
 parser.add_argument("--patience", type=int, default=10,
                     help="Early stopping patience")
@@ -44,6 +44,8 @@ parser.add_argument("--debug", type=bool_flag, default=False,
                     help="Run the code in debug mode?")
 parser.add_argument('--disable-cuda', action='store_true',
                     help='Disable CUDA')
+parser.add_argument('--filter', action='store_true',
+                    help='Filter the samples while evaluation')
 
 params = parser.parse_args()
 
@@ -81,8 +83,10 @@ for e in range(params.nEpochs):
                  % (e, loss, toc - tic))
 
     if (e + 1) % params.eval_every == 0:
+        tic = time.time()
         log_data = evaluator.get_log_data()
-        logging.info('Performance:' + str(log_data))
+        toc = time.time()
+        logging.info('Performance: %s in %f' % (str(log_data), (toc - tic)))
 
         # for tag, value in log_data.items():
         #     tb_logger.scalar_summary(tag, value, e + 1)

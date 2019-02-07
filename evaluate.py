@@ -19,8 +19,20 @@ parser.add_argument("--embedding_dim", type=int, default=50,
                     help="Entity and relations embedding size")
 parser.add_argument("--neg_sample_size", type=int, default=30,
                     help="No. of negative samples to compare to for MRR/MR/Hit@10")
+parser.add_argument('--disable-cuda', action='store_true',
+                    help='Disable CUDA')
+parser.add_argument('--filter', action='store_true',
+                    help='Filter the samples while evaluation')
 
 params = parser.parse_args()
+
+params.device = None
+if not params.disable_cuda and torch.cuda.is_available():
+    params.device = torch.device('cuda')
+else:
+    params.device = torch.device('cpu')
+
+logging.info(params.device)
 
 exps_dir = os.path.join(MAIN_DIR, 'experiments')
 params.exp_dir = os.path.join(exps_dir, params.experiment_name)

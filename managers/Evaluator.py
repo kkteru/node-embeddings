@@ -1,22 +1,31 @@
 import numpy as np
 import torch
+import pdb
 
 
 class Evaluator():
     def __init__(self, model, data_sampler, sample_size=0):
         self.model = model
         self.data_sampler = data_sampler
-        self.sample_size = sample_size if sample_size != 0 else len(data_sampler.data)
+        self.sample_size = sample_size
 
     def _rank(self, sample):
-        idx = np.random.random_integers(0, len(self.data_sampler.ent) - 1, self.sample_size)
+        if self.sample_size == 0:
+            idx = np.array(range(len(self.data_sampler.ent)))
+            head_ids = np.array(list(self.data_sampler.ent))[idx]
+        else:
+            idx = np.random.random_integers(0, len(self.data_sampler.ent) - 1, self.sample_size)
+            head_ids = np.array(list(self.data_sampler.ent))[idx]
+            head_ids[0] = sample[0]
 
-        head_ids = np.array(list(self.data_sampler.ent))[idx]
-        head_ids[0] = sample[0]
+        eval_batch = np.array(list(zip(head_ids, [sample[1]] * len(head_ids), [sample[2]] * len(head_ids))))
+        if self.model.params.filter:
+            np.array(list(filter(lambda x: tuple(x) not in self.data_sampler.data_set, eval_batch)))  # This only filters from validation set. Wrong!
+        eval_batch = torch.from_numpy(eval_batch)
 
-        heads = self.model.ent_embeddings(torch.LongTensor(head_ids).to(device=self.model.params.device))
-        tails = self.model.ent_embeddings(torch.LongTensor([sample[1]] * len(head_ids)).to(device=self.model.params.device))
-        rels = self.model.rel_embeddings(torch.LongTensor([sample[2]] * len(head_ids)).to(device=self.model.params.device))
+        heads = self.model.ent_embeddings(eval_batch[:, 0].to(device=self.model.params.device))
+        tails = self.model.ent_embeddings(eval_batch[:, 1].to(device=self.model.params.device))
+        rels = self.model.rel_embeddings(eval_batch[:, 2].to(device=self.model.params.device))
 
         scores = self.model.get_score(heads, tails, rels)
 

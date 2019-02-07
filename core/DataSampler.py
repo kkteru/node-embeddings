@@ -10,6 +10,7 @@ class DataSampler():
 
         assert self.data.shape[1] == 3
 
+        self.data_set = set(map(tuple, self.data))
         self.ent = self.get_ent(self.data)  # Fill this
         self.rel = self.get_rel(self.data)  # Fill this
 
@@ -33,7 +34,8 @@ class DataSampler():
 
     def _sample_negative(self, sample):
         neg_sample = np.array(sample)
-        neg_sample[0] = self.data[np.random.randint(0, len(self.data)), 0]
+        while tuple(neg_sample) in self.data_set:
+            neg_sample[0] = np.random.randint(0, len(self.ent))
         return neg_sample
 
     def get_negative_batch(self, batch):
