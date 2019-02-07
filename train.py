@@ -42,10 +42,20 @@ parser.add_argument("--momentum", type=float, default=0,
 
 parser.add_argument("--debug", type=bool_flag, default=False,
                     help="Run the code in debug mode?")
+parser.add_argument('--disable-cuda', action='store_true',
+                    help='Disable CUDA')
 
 params = parser.parse_args()
 
 initialize_experiment(params)
+
+params.device = None
+if not params.disable_cuda and torch.cuda.is_available():
+    params.device = torch.device('cuda')
+else:
+    params.device = torch.device('cpu')
+
+logging.info(params.device)
 
 train_data_sampler = DataSampler(TRAIN_DATA_PATH, params.debug)
 valid_data_sampler = DataSampler(VALID_DATA_PATH)
@@ -57,7 +67,7 @@ batch_size = int(len(train_data_sampler.data) / params.nBatches)
 
 logging.info('Starting training with batch size = %d' % batch_size)
 
-tb_logger = Logger(params.exp_dir)
+# tb_logger = Logger(params.exp_dir)
 
 for e in range(params.nEpochs):
     tic = time.time()
@@ -65,7 +75,7 @@ for e in range(params.nEpochs):
         loss = trainer.one_step(batch_size)
     toc = time.time()
 
-    tb_logger.scalar_summary('loss', loss, e)
+    # tb_logger.scalar_summary('loss', loss, e)
 
     logging.info('Epoch %d with loss: %f in %f'
                  % (e, loss, toc - tic))
@@ -74,8 +84,8 @@ for e in range(params.nEpochs):
         log_data = evaluator.get_log_data()
         logging.info('Performance:' + str(log_data))
 
-        for tag, value in log_data.items():
-            tb_logger.scalar_summary(tag, value, e + 1)
+        # for tag, value in log_data.items():
+        #     tb_logger.scalar_summary(tag, value, e + 1)
 
         to_continue = trainer.select_model(log_data)
         if not to_continue:
