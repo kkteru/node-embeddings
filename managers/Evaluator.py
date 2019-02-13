@@ -20,7 +20,7 @@ class Evaluator():
 
         eval_batch = np.array(list(zip(head_ids, [sample[1]] * len(head_ids), [sample[2]] * len(head_ids))))
         if self.model.params.filter:
-            np.array(list(filter(lambda x: tuple(x) not in self.data_sampler.data_set, eval_batch)))  # This only filters from validation set. Wrong!
+            eval_batch = np.array(list(filter(lambda x: tuple(x) not in self.data_sampler.data_set, eval_batch)))  # This only filters from validation set. Wrong!
         eval_batch = torch.from_numpy(eval_batch)
 
         heads = self.model.ent_embeddings(eval_batch[:, 0].to(device=self.model.params.device))
