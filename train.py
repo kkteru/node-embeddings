@@ -31,13 +31,13 @@ parser.add_argument("--margin", type=int, default=1,
                     help="The margin between positive and negative samples in the max-margin loss")
 parser.add_argument("--p_norm", type=int, default=1,
                     help="The norm to use for the distance metric")
-parser.add_argument("--optimizer", type=str, default="SGD",
-                    help="Which optimizer to use?")
+parser.add_argument("--optimizer", type=str, default="Adam",
+                    help="Which optimizer to use? SGD/Adam")
 parser.add_argument("--embedding_dim", type=int, default=50,
                     help="Entity and relations embedding size")
 parser.add_argument("--lr", type=float, default=0.01,
                     help="Learning rate of the optimizer")
-parser.add_argument("--momentum", type=float, default=0,
+parser.add_argument("--momentum", type=float, default=0.9,
                     help="Momentum of the SGD optimizer")
 
 parser.add_argument("--debug", type=bool_flag, default=False,

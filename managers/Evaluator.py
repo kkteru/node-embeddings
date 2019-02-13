@@ -11,8 +11,7 @@ class Evaluator():
 
     def _rank(self, sample):
         if self.sample_size == 0:
-            idx = np.array(range(len(self.data_sampler.ent)))
-            head_ids = np.array(list(self.data_sampler.ent))[idx]
+            head_ids = np.array(list(self.data_sampler.ent))
         else:
             idx = np.random.random_integers(0, len(self.data_sampler.ent) - 1, self.sample_size)
             head_ids = np.array(list(self.data_sampler.ent))[idx]

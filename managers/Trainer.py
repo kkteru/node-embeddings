@@ -14,6 +14,8 @@ class Trainer():
 
         if params.optimizer == "SGD":
             self.optimizer = optim.SGD(self.model.parameters(), lr=params.lr, momentum=params.momentum)
+        if params.optimizer == "Adam":
+            self.optimizer = optim.Adam(self.model.parameters(), lr=params.lr)
 
         self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')
 
