@@ -31,13 +31,13 @@ parser.add_argument("--margin", type=int, default=1,
                     help="The margin between positive and negative samples in the max-margin loss")
 parser.add_argument("--p_norm", type=int, default=1,
                     help="The norm to use for the distance metric")
-parser.add_argument("--optimizer", type=str, default="Adam",
+parser.add_argument("--optimizer", type=str, default="SGD",
                     help="Which optimizer to use? SGD/Adam")
 parser.add_argument("--embedding_dim", type=int, default=50,
                     help="Entity and relations embedding size")
 parser.add_argument("--lr", type=float, default=0.01,
                     help="Learning rate of the optimizer")
-parser.add_argument("--momentum", type=float, default=0.9,
+parser.add_argument("--momentum", type=float, default=0,
                     help="Momentum of the SGD optimizer")
 
 parser.add_argument("--debug", type=bool_flag, default=False,
@@ -72,15 +72,17 @@ logging.info('Starting training with batch size = %d' % batch_size)
 # tb_logger = Logger(params.exp_dir)
 
 for e in range(params.nEpochs):
+    res = 0
     tic = time.time()
     for b in range(params.nBatches):
         loss = trainer.one_step(batch_size)
+        res += loss
     toc = time.time()
 
     # tb_logger.scalar_summary('loss', loss, e)
 
     logging.info('Epoch %d with loss: %f in %f'
-                 % (e, loss, toc - tic))
+                 % (e, res, toc - tic))
 
     if (e + 1) % params.eval_every == 0:
         tic = time.time()

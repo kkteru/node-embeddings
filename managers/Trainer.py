@@ -1,3 +1,4 @@
+import pdb
 import os
 import logging
 import torch
@@ -33,6 +34,7 @@ class Trainer():
         neg_score = score[int(len(score) / 2): len(score)]
 
         loss = self.criterion(pos_score, neg_score, torch.Tensor([-1]).to(device=self.params.device))
+#        pdb.set_trace()
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
