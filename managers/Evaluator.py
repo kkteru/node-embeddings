@@ -22,7 +22,7 @@ class Evaluator():
         dist = pairwise_distances(c_h_e, self.model.ent_embeddings.weight.data.cpu().numpy(), metric='manhattan')
 
         rankArrayHead = np.argsort(dist, axis=1)
-        
+
         # Don't check whether it is false negative
         rankListHead = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 0], rankArrayHead)]
 
@@ -35,7 +35,6 @@ class Evaluator():
 
         log_data = dict([
             ('hit@10', hit10),
-            # ('mrr', mrr),
             ('mr', mr)])
 
         return log_data

@@ -20,8 +20,8 @@ class Trainer():
 
         self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')
 
-        self.best_mrr = 0
-        self.last_mrr = 0
+        self.best_mr = 0
+        self.last_mr = 0
         self.bad_count = 0
 
         assert self.optimizer is not None
@@ -42,17 +42,15 @@ class Trainer():
         return loss
 
     def select_model(self, log_data):
-        if log_data['mrr'] > self.last_mrr:
+        if log_data['mr'] < self.best_mr:
             self.bad_count = 0
-
-            if log_data['mrr'] > self.best_mrr:
-                torch.save(self.model, os.path.join(self.params.exp_dir, 'best_model.pth'))  # Does it overwrite or fuck with the existing file?
-                logging.info('Better model found w.r.t MRR. Saved it!')
-                self.best_mrr = log_data['mrr']
+            torch.save(self.model, os.path.join(self.params.exp_dir, 'best_model.pth'))  # Does it overwrite or fuck with the existing file?
+            logging.info('Better model found w.r.t MR. Saved it!')
+            self.best_mr = log_data['mr']
         else:
             self.bad_count = self.bad_count + 1
             if self.bad_count > self.params.patience:
                 logging.info('Out of patience. Stopping the training loop.')
                 return False
-        self.last_mrr = log_data['mrr']
+        self.last_mr = log_data['mr']
         return True
