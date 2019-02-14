@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 
 
-TOTAL_ENTITIES = 14541
-TOTAL_RELATIONS = 237
+TOTAL_ENTITIES = 14951
+TOTAL_RELATIONS = 1345
 
 
 class TransE(nn.Module):
