@@ -23,7 +23,7 @@ parser.add_argument("--eval_every", type=int, default=25,
 parser.add_argument("--save_every", type=int, default=50,
                     help="Interval of epochs to save a checkpoint of the model?")
 
-parser.add_argument("--sample_size", type=int, default=100,
+parser.add_argument("--sample_size", type=int, default=0,
                     help="No. of negative samples to compare to for MRR/MR/Hit@10")
 parser.add_argument("--patience", type=int, default=10,
                     help="Early stopping patience")

@@ -37,7 +37,7 @@ class Evaluator():
 
         assert len(ranks) == len(self.data_sampler.data)
 
-        hit10 = np.sum(ranks < 10) / len(ranks)
+        hit10 = np.sum(ranks <= 10) / len(ranks)
         mrr = np.mean(1 / ranks)
         mr = np.mean(ranks)
 
