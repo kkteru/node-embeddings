@@ -1,15 +1,21 @@
 import logging
 import random
 import numpy as np
+import pdb
 
 
 class DataSampler():
-    def __init__(self, file_path, debug=False):
+    def __init__(self, file_path, nBatches=1, debug=False):
+
         end = 20001 if debug else -1
         with open(file_path) as f:
             self.data = np.array([list(map(int, sample.split())) for sample in f.read().split('\n')[1:end]], dtype=np.int64)
 
         assert self.data.shape[1] == 3
+
+        self.batch_size = int(len(self.data) / nBatches)
+        # pdb.set_trace()
+        self.idx = np.arange(len(self.data))
 
         self.data_set = set(map(tuple, self.data))
         self.ent = self.get_ent(self.data)  # Fill this
@@ -23,8 +29,11 @@ class DataSampler():
     def get_rel(self, debug=False):
         return set([i.item() for i in self.data[:, 2]])
 
-    def get_batch(self, batch_size):
-        ids = np.random.random_integers(0, len(self.data) - 1, batch_size)
+    def get_batch(self, n_batch):
+        if n_batch == 0:
+            np.random.shuffle(self.idx)
+        # pdb.set_trace()
+        ids = self.idx[n_batch * self.batch_size: (n_batch + 1) * self.batch_size]
         pos_batch = self.data[ids]
 
         neg_batch = self.get_negative_batch(pos_batch)

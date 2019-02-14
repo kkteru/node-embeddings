@@ -57,16 +57,17 @@ if not params.disable_cuda and torch.cuda.is_available():
 else:
     params.device = torch.device('cpu')
 
+# params.batch_size = int(len(train_data_sampler.data) / params.nBatches)
+
 logging.info(params.device)
 
-train_data_sampler = DataSampler(TRAIN_DATA_PATH, params.debug)
+train_data_sampler = DataSampler(TRAIN_DATA_PATH, params.nBatches, params.debug)
 valid_data_sampler = DataSampler(VALID_DATA_PATH)
 transE = initialize_model(params)
 trainer = Trainer(transE, train_data_sampler, params)
 evaluator = Evaluator(transE, valid_data_sampler, params.sample_size)
 
 batch_size = int(len(train_data_sampler.data) / params.nBatches)
-
 logging.info('Starting training with batch size = %d' % batch_size)
 
 # tb_logger = Logger(params.exp_dir)
@@ -75,7 +76,7 @@ for e in range(params.nEpochs):
     res = 0
     tic = time.time()
     for b in range(params.nBatches):
-        loss = trainer.one_step(batch_size)
+        loss = trainer.one_step(b)
         res += loss
     toc = time.time()
 

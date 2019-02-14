@@ -26,8 +26,8 @@ class Trainer():
 
         assert self.optimizer is not None
 
-    def one_step(self, batch_size):  # rename
-        batch_h, batch_t, batch_r = self.data.get_batch(batch_size)
+    def one_step(self, n_batch):  # rename
+        batch_h, batch_t, batch_r = self.data.get_batch(n_batch)
         score = self.model(batch_h, batch_t, batch_r)
 
         pos_score = score[0: int(len(score) / 2)]
