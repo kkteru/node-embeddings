@@ -93,8 +93,8 @@ for e in range(params.nEpochs):
         # for tag, value in log_data.items():
         #     tb_logger.scalar_summary(tag, value, e + 1)
 
-        to_continue = trainer.select_model(log_data)
-        if not to_continue:
-            break
+        # to_continue = trainer.select_model(log_data)
+        # if not to_continue:
+        #     break
     if (e + 1) % params.save_every == 0:
         torch.save(transE, os.path.join(params.exp_dir, 'checkpoint.pth'))
