@@ -1,4 +1,5 @@
 import logging
+import random
 import numpy as np
 
 
@@ -34,8 +35,12 @@ class DataSampler():
 
     def _sample_negative(self, sample):
         neg_sample = np.array(sample)
-        while tuple(neg_sample) in self.data_set:
-            neg_sample[0] = np.random.randint(0, len(self.ent))
+        if random.random() < 0.5:
+            while tuple(neg_sample) in self.data_set:
+                neg_sample[0] = np.random.randint(0, len(self.ent))
+        else:
+            while tuple(neg_sample) in self.data_set:
+                neg_sample[1] = np.random.randint(0, len(self.ent))
         return neg_sample
 
     def get_negative_batch(self, batch):
