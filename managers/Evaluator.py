@@ -51,7 +51,7 @@ class Evaluator():
         isHit10ListHead = [x for x in rankListHead if x < 10]
 
         mr = np.mean(rankListHead)
-        hit10 = len(isHit10ListHead)
+        hit10 = len(isHit10ListHead) / len(rankListHead)
 
         # ranks = np.array(list(map(self._rank, self.data_sampler.data)))
 
