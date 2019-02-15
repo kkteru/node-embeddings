@@ -19,19 +19,40 @@ class Evaluator():
 
         c_h_e = t_e - r_e
 
-        dist = pairwise_distances(c_h_e, self.model.ent_embeddings.weight.data.cpu().numpy(), metric='manhattan')
+        distHead = pairwise_distances(c_h_e, self.model.ent_embeddings.weight.data.cpu().numpy(), metric='manhattan')
 
-        rankArrayHead = np.argsort(dist, axis=1)
+        rankArrayHead = np.argsort(distHead, axis=1)
 
         # Don't check whether it is false negative
         rankListHead = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 0], rankArrayHead)]
 
         isHit10ListHead = [x for x in rankListHead if x < 10]
 
-        mr = np.mean(rankListHead)
-        hit10 = len(isHit10ListHead) / len(rankListHead)
-
         assert len(rankListHead) == len(self.data_sampler.data)
+
+        mr_h = np.mean(rankListHead)
+        hit10_h = len(isHit10ListHead) / len(rankListHead)
+
+# -------------------------------------------------------------------- #
+
+        c_t_e = h_e + r_e
+
+        distTail = pairwise_distances(c_t_e, self.model.ent_embeddings.weight.data.cpu().numpy(), metric='manhattan')
+
+        rankArrayTail = np.argsort(distTail, axis=1)
+
+        # Don't check whether it is false negative
+        rankListTail = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 1], rankArrayTail)]
+
+        isHit10ListTail = [x for x in rankListTail if x < 10]
+
+        assert len(rankListTail) == len(self.data_sampler.data)
+
+        mr_t = np.mean(rankListTail)
+        hit10_t = len(isHit10ListTail) / len(rankListTail)
+
+        mr = (mr_h + mr_t) / 2
+        hit10 = (hit10_h + hit10_t) / 2
 
         log_data = dict([
             ('hit@10', hit10),
