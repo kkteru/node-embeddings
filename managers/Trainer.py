@@ -20,8 +20,8 @@ class Trainer():
 
         self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')
 
-        self.best_mr = 0
-        self.last_mr = 0
+        self.best_mr = 1e10
+        self.last_mr = 1e10
         self.bad_count = 0
 
         assert self.optimizer is not None
