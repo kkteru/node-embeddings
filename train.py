@@ -22,6 +22,8 @@ parser.add_argument("--eval_every", type=int, default=25,
                     help="Interval of epochs to evaluate the model?")
 parser.add_argument("--save_every", type=int, default=50,
                     help="Interval of epochs to save a checkpoint of the model?")
+parser.add_argument('--eval_mode', type=str, default="head",
+                    help='Evaluate on head and/or tail prediction?')
 
 parser.add_argument("--sample_size", type=int, default=0,
                     help="No. of negative samples to compare to for MRR/MR/Hit@10")
@@ -87,7 +89,7 @@ for e in range(params.nEpochs):
 
     if (e + 1) % params.eval_every == 0:
         tic = time.time()
-        log_data = evaluator.get_log_data()
+        log_data = evaluator.get_log_data(params.eval_mode)
         toc = time.time()
         logging.info('Performance: %s in %f' % (str(log_data), (toc - tic)))
 
