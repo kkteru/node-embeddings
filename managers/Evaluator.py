@@ -13,16 +13,12 @@ class Evaluator():
     # Find the rank of ground truth head in the distance array,
     # If (head, num, rel) in all_data,
     # skip without counting.
-    def _argwhere(self, head, tail, rel, array, h):
-        wrongAnswer = 0
-        for num in array:
-            if num == head * h + tail * (1 - h):
-                return wrongAnswer
-            elif (head * (1 - h) + num * h, num * (1 - h) + tail * h, rel) in self.data_sampler.all_data:
-                continue
-            else:
-                wrongAnswer += 1
-        return wrongAnswer
+    def _filter(self, head, tail, rel, array, rank, h):
+        filtered_rank = rank
+        for i in range(rank):
+            if (head * (1 - h) + array[i] * h, array[i] * (1 - h) + tail * h, rel) in self.data_sampler.all_data:
+                filtered_rank = filtered_rank - 1
+        return filtered_rank
 
     def get_log_data(self, eval_mode='head'):
         # pdb.set_trace()
@@ -42,12 +38,11 @@ class Evaluator():
             rankArrayHead = np.argsort(distHead, axis=1)
 
             # Don't check whether it is false negative
-            if not self.params.filter:
-                rankListHead = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 0], rankArrayHead)]
-            else:
-                rankListHead = [int(self._argwhere(elem[0], elem[1], elem[2], elem[3], h=1))
+            rankListHead = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 0], rankArrayHead)]
+            if self.params.filter:
+                rankListHead = [int(self._filter(elem[0], elem[1], elem[2], elem[3], elem[4], h=1))
                                 for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
-                                                self.data_sampler.data[:, 2], rankArrayHead)]
+                                                self.data_sampler.data[:, 2], rankListHead, rankArrayHead)]
 
             isHit10ListHead = [x for x in rankListHead if x < 10]
 
