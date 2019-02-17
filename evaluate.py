@@ -24,6 +24,8 @@ parser.add_argument('--disable-cuda', action='store_true',
                     help='Disable CUDA')
 parser.add_argument('--filter', action='store_true',
                     help='Filter the samples while evaluation')
+parser.add_argument('--eval_mode', type=str, default="head",
+                    help='Evaluate on head and/or tail prediction?')
 
 params = parser.parse_args()
 
@@ -46,7 +48,7 @@ logging.info('Testing model %s' % os.path.join(params.exp_dir, 'best_model.pth')
 
 
 tic = time.time()
-log_data = evaluator.get_log_data()
+log_data = evaluator.get_log_data(params.eval_mode)
 toc = time.time()
 
 logging.info('Test performance: %s in %f' % (str(log_data), toc - tic))
