@@ -18,7 +18,7 @@ class Evaluator():
         for num in array:
             if num == head * h + tail * (1 - h):
                 return wrongAnswer
-            elif self.params.filter & (head * (1 - h) + num * h, num * (1 - h) + tail * h, rel) in self.data_sampler.all_data:
+            elif (head * (1 - h) + num * h, num * (1 - h) + tail * h, rel) in self.data_sampler.all_data:
                 continue
             else:
                 wrongAnswer += 1
@@ -42,9 +42,12 @@ class Evaluator():
             rankArrayHead = np.argsort(distHead, axis=1)
 
             # Don't check whether it is false negative
-            rankListHead = [int(self._argwhere(elem[0], elem[1], elem[2]), elem[3], h=1)
-                            for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
-                                            self.data_sampler.data[:, 2], rankArrayHead)]
+            if not self.params.filter:
+                rankListHead = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 0], rankArrayHead)]
+            else:
+                rankListHead = [int(self._argwhere(elem[0], elem[1], elem[2], elem[3], h=1))
+                                for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
+                                                self.data_sampler.data[:, 2], rankArrayHead)]
 
             isHit10ListHead = [x for x in rankListHead if x < 10]
 
@@ -63,7 +66,12 @@ class Evaluator():
             rankArrayTail = np.argsort(distTail, axis=1)
 
             # Don't check whether it is false negative
-            rankListTail = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 1], rankArrayTail)]
+            if not self.params.filter:
+                rankListTail = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 1], rankArrayTail)]
+            else:
+                rankListTail = [int(self._argwhere(elem[0], elem[1], elem[2], elem[3], h=0))
+                                for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
+                                                self.data_sampler.data[:, 2], rankArrayTail)]
 
             isHit10ListTail = [x for x in rankListTail if x < 10]
 
