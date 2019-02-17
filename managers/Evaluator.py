@@ -42,7 +42,7 @@ class Evaluator():
             if self.params.filter:
                 rankListHead = [int(self._filter(elem[0], elem[1], elem[2], elem[3], elem[4], h=1))
                                 for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
-                                                self.data_sampler.data[:, 2], rankListHead, rankArrayHead)]
+                                                self.data_sampler.data[:, 2], rankArrayHead, rankListHead)]
 
             isHit10ListHead = [x for x in rankListHead if x < 10]
 
