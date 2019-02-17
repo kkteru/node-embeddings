@@ -63,11 +63,11 @@ else:
 
 logging.info(params.device)
 
-train_data_sampler = DataSampler(TRAIN_DATA_PATH, params.nBatches, params.debug)
-valid_data_sampler = DataSampler(VALID_DATA_PATH)
+train_data_sampler = DataSampler(TRAIN_DATA_PATH, ALL_DATA_PATH, params.nBatches, params.debug)
+valid_data_sampler = DataSampler(VALID_DATA_PATH, ALL_DATA_PATH)
 transE = initialize_model(params)
 trainer = Trainer(transE, train_data_sampler, params)
-evaluator = Evaluator(transE, valid_data_sampler, params.sample_size)
+evaluator = Evaluator(transE, valid_data_sampler, params)
 
 batch_size = int(len(train_data_sampler.data) / params.nBatches)
 logging.info('Starting training with batch size = %d' % batch_size)

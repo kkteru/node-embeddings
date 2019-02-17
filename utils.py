@@ -19,6 +19,7 @@ DATA_PATH = os.path.join(MAIN_DIR, 'data/FB15K')
 TRAIN_DATA_PATH = os.path.join(DATA_PATH, 'train2id.txt')
 VALID_DATA_PATH = os.path.join(DATA_PATH, 'valid2id.txt')
 TEST_DATA_PATH = os.path.join(DATA_PATH, 'test2id.txt')
+ALL_DATA_PATH = os.path.join(DATA_PATH, 'triple2id.txt')
 
 
 def bool_flag(s):

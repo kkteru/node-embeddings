@@ -5,7 +5,7 @@ import pdb
 
 
 class DataSampler():
-    def __init__(self, file_path, nBatches=1, debug=False):
+    def __init__(self, file_path, all_data_path, nBatches=1, debug=False):
 
         end = 20001 if debug else -1
         with open(file_path) as f:
@@ -13,11 +13,16 @@ class DataSampler():
 
         assert self.data.shape[1] == 3
 
+        with open(all_data_path) as f:
+            self.all_data = np.array([list(map(int, sample.split())) for sample in f.read().split('\n')[1:end]], dtype=np.int64)
+        assert self.all_data.shape[1] == 3
+
         self.batch_size = int(len(self.data) / nBatches)
         # pdb.set_trace()
         self.idx = np.arange(len(self.data))
 
         self.data_set = set(map(tuple, self.data))
+        self.all_data_set = set(map(tuple, self.all_data))
         self.ent = self.get_ent(self.data)  # Fill this
         self.rel = self.get_rel(self.data)  # Fill this
 

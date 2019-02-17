@@ -40,9 +40,9 @@ logging.info(params.device)
 exps_dir = os.path.join(MAIN_DIR, 'experiments')
 params.exp_dir = os.path.join(exps_dir, params.experiment_name)
 
-test_data_sampler = DataSampler(TEST_DATA_PATH)
+test_data_sampler = DataSampler(TEST_DATA_PATH, ALL_DATA_PATH)
 transE = initialize_model(params)
-evaluator = Evaluator(transE, test_data_sampler, params.neg_sample_size)
+evaluator = Evaluator(transE, test_data_sampler, params)
 
 logging.info('Testing model %s' % os.path.join(params.exp_dir, 'best_model.pth'))
 

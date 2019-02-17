@@ -5,10 +5,24 @@ import pdb
 
 
 class Evaluator():
-    def __init__(self, model, data_sampler, sample_size=0):
+    def __init__(self, model, data_sampler, params):
         self.model = model
         self.data_sampler = data_sampler
-        self.sample_size = sample_size
+        self.params = params
+
+    # Find the rank of ground truth head in the distance array,
+    # If (head, num, rel) in all_data,
+    # skip without counting.
+    def _argwhereHead(self, head, tail, rel, array, h):
+        wrongAnswer = 0
+        for num in array:
+            if num == head * h + tail * (1 - h):
+                return wrongAnswer
+            elif self.params.filter & (head * (1 - h) + num * h, num * (1 - h) + tail * h, rel) in self.data_sampler.all_data:
+                continue
+            else:
+                wrongAnswer += 1
+        return wrongAnswer
 
     def get_log_data(self, eval_mode='head'):
         # pdb.set_trace()
@@ -28,7 +42,9 @@ class Evaluator():
             rankArrayHead = np.argsort(distHead, axis=1)
 
             # Don't check whether it is false negative
-            rankListHead = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 0], rankArrayHead)]
+            rankListHead = [int(self._argwhere(elem[0], elem[1], elem[2]), elem[3], h=1)
+                            for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
+                                            self.data_sampler.data[:, 2], rankArrayHead)]
 
             isHit10ListHead = [x for x in rankListHead if x < 10]
 
