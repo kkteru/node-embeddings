@@ -13,7 +13,7 @@ class Evaluator():
     # Find the rank of ground truth head in the distance array,
     # If (head, num, rel) in all_data,
     # skip without counting.
-    def _argwhereHead(self, head, tail, rel, array, h):
+    def _argwhere(self, head, tail, rel, array, h):
         wrongAnswer = 0
         for num in array:
             if num == head * h + tail * (1 - h):
