@@ -1,14 +1,11 @@
 # transE-implementation
 My experiments with transE
 
-Todo list
-- [x] Setup pipelined experiment folder
-- [x] Log data in the experiment folder: params, train and eval logs
-- [x] Save the best model in the experiment folder
-- [x] Save checkpoint models in the experiment folder
-- [x] Test loading a checkpointed model and framework to load an existing model
-- [x] Use tensorboard to visualize the results
+## Results
+- Head prediction: Hits@10: 0.3419952261	| MR: 288.1974065
+- Tail prediction: Hits@10: 0.41082764808450845 | MR: 198.27008176601041
+- Average prediction: Hits@10: 0.37414298048111594 | MR: 243.20541382404224
 
-- [x] Refactor into managers and core. Managers have access to core members and use them to get results.
-- [ ] Tune the performance
-- [ ] Port it to optimize on GPUs
+## Scope of improvement
+- Multiple negative samples
+- Better optimizer
