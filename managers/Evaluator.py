@@ -61,12 +61,11 @@ class Evaluator():
             rankArrayTail = np.argsort(distTail, axis=1)
 
             # Don't check whether it is false negative
-            if not self.params.filter:
-                rankListTail = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 1], rankArrayTail)]
-            else:
-                rankListTail = [int(self._argwhere(elem[0], elem[1], elem[2], elem[3], h=0))
+            rankListTail = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 1], rankArrayTail)]
+            if self.params.filter:
+                rankListTail = [int(self._filter(elem[0], elem[1], elem[2], elem[3], elem[4], h=0))
                                 for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
-                                                self.data_sampler.data[:, 2], rankArrayTail)]
+                                                self.data_sampler.data[:, 2], rankArrayTail, rankListTail)]
 
             isHit10ListTail = [x for x in rankListTail if x < 10]
 
