@@ -35,8 +35,8 @@ def bool_flag(s):
 
 
 def initialize_experiment(params):
-
-    exps_dir = os.path.join(MAIN_DIR, 'experiments')
+    params.main_dir = os.path.relpath(os.path.dirname(os.path.abspath(__file__)))
+    exps_dir = os.path.join(params.main_dir, 'experiments')
     if not os.path.exists(exps_dir):
         os.makedirs(exps_dir)
 

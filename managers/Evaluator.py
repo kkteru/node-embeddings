@@ -1,7 +1,17 @@
 import numpy as np
 import torch
-from sklearn.metrics.pairwise import pairwise_distances
 import pdb
+from sklearn import metrics
+import torch.nn.functional as F
+
+
+def get_torch_sparse_matrix(A, dev):
+    '''
+    A : Sparse adjacency matrix
+    '''
+    idx = torch.LongTensor([A.tocoo().row, A.tocoo().col])
+    dat = torch.FloatTensor(A.tocoo().data)
+    return torch.sparse.FloatTensor(idx, dat, torch.Size([A.shape[0], A.shape[1]])).to(device=dev)
 
 
 class Evaluator():
@@ -10,75 +20,22 @@ class Evaluator():
         self.data_sampler = data_sampler
         self.params = params
 
-    # Find the rank of ground truth head in the distance array,
-    # If (head, num, rel) in all_data,
-    # skip without counting.
-    def _filter(self, head, tail, rel, array, rank, h):
-        filtered_rank = rank
-        for i in range(rank):
-            if (head * (1 - h) + array[i] * h, array[i] * (1 - h) + tail * h, rel) in self.data_sampler.all_data:
-                filtered_rank = filtered_rank - 1
-        return filtered_rank
+    def get_log_data(self, data='valid'):
 
-    def get_log_data(self, eval_mode='head'):
-        # pdb.set_trace()
+        if data == 'valid':
+            eval_batch_h, eval_batch_t, eval_batch_r = self.data_sampler.get_valid_data()
+        elif data == 'test':
+            eval_batch_h, eval_batch_t, eval_batch_r = self.data_sampler.get_test_data()
 
-        h_e = self.model.ent_embeddings.weight.data.cpu().numpy()[self.data_sampler.data[:, 0]]
-        t_e = self.model.ent_embeddings.weight.data.cpu().numpy()[self.data_sampler.data[:, 1]]
-        r_e = self.model.rel_embeddings.weight.data.cpu().numpy()[self.data_sampler.data[:, 2]]
+        score = self.model(eval_batch_h, eval_batch_t, eval_batch_r)
 
-        mr = []
-        hit10 = []
+        all_pos_scores = score[0: int(len(score) / 2)].detach().cpu().tolist()
+        all_neg_scores = score[int(len(score) / 2): len(score)].detach().cpu().tolist()
 
-        if eval_mode == 'head' or eval_mode == 'avg':
-            c_h_e = t_e - r_e
-
-            distHead = pairwise_distances(c_h_e, self.model.ent_embeddings.weight.data.cpu().numpy(), metric='manhattan')
-
-            rankArrayHead = np.argsort(distHead, axis=1)
-
-            # Don't check whether it is false negative
-            rankListHead = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 0], rankArrayHead)]
-            if self.params.filter:
-                rankListHead = [int(self._filter(elem[0], elem[1], elem[2], elem[3], elem[4], h=1))
-                                for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
-                                                self.data_sampler.data[:, 2], rankArrayHead, rankListHead)]
-
-            isHit10ListHead = [x for x in rankListHead if x < 10]
-
-            assert len(rankListHead) == len(self.data_sampler.data)
-
-            mr.append(np.mean(rankListHead))
-            hit10.append(len(isHit10ListHead) / len(rankListHead))
-
-# -------------------------------------------------------------------- #
-
-        if eval_mode == 'tail' or eval_mode == 'avg':
-            c_t_e = h_e + r_e
-
-            distTail = pairwise_distances(c_t_e, self.model.ent_embeddings.weight.data.cpu().numpy(), metric='manhattan')
-
-            rankArrayTail = np.argsort(distTail, axis=1)
-
-            # Don't check whether it is false negative
-            rankListTail = [int(np.argwhere(elem[1] == elem[0])) for elem in zip(self.data_sampler.data[:, 1], rankArrayTail)]
-            if self.params.filter:
-                rankListTail = [int(self._filter(elem[0], elem[1], elem[2], elem[3], elem[4], h=0))
-                                for elem in zip(self.data_sampler.data[:, 0], self.data_sampler.data[:, 1],
-                                                self.data_sampler.data[:, 2], rankArrayTail, rankListTail)]
-
-            isHit10ListTail = [x for x in rankListTail if x < 10]
-
-            assert len(rankListTail) == len(self.data_sampler.data)
-
-            mr.append(np.mean(rankListTail))
-            hit10.append(len(isHit10ListTail) / len(rankListTail))
-
-        mr = np.mean(mr)
-        hit10 = np.mean(hit10)
+        all_labels = [0] * len(all_pos_scores) + [1] * len(all_neg_scores)
+        auc = metrics.roc_auc_score(all_labels, all_pos_scores + all_neg_scores)
 
         log_data = dict([
-            ('hit@10', hit10),
-            ('mr', mr)])
+            ('auc', auc)])
 
         return log_data

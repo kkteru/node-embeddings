@@ -4,6 +4,7 @@ import logging
 import torch
 import torch.optim as optim
 import torch.nn as nn
+from sklearn import metrics
 
 
 class Trainer():
@@ -20,37 +21,48 @@ class Trainer():
 
         self.criterion = nn.MarginRankingLoss(self.params.margin, reduction='sum')
 
-        self.best_mr = 1e10
-        self.last_mr = 1e10
+        self.best_metric = 1e10
+        self.last_metric = 1e10
         self.bad_count = 0
 
         assert self.optimizer is not None
 
-    def one_step(self, n_batch):  # rename
-        batch_h, batch_t, batch_r = self.data.get_batch(n_batch)
-        score = self.model(batch_h, batch_t, batch_r)
+    def one_epoch(self):
+        all_pos_scores = []
+        all_neg_scores = []
+        total_loss = 0
+        for b in range(self.params.nBatches):
+            batch_h, batch_t, batch_r = self.data.get_batch(b)
+            score = self.model(batch_h, batch_t, batch_r)
 
-        pos_score = score[0: int(len(score) / 2)]
-        neg_score = score[int(len(score) / 2): len(score)]
+            pos_score = score[0: int(len(score) / 2)]
+            neg_score = score[int(len(score) / 2): len(score)]
 
-        loss = self.criterion(pos_score, neg_score, torch.Tensor([-1]).to(device=self.params.device))
-#        pdb.set_trace()
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
+            all_pos_scores += pos_score.detach().cpu().tolist()
+            all_neg_scores += neg_score.detach().cpu().tolist()
 
-        return loss
+            loss = self.criterion(pos_score, neg_score, torch.Tensor([-1]).to(device=self.params.device))
+            total_loss += loss
+
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
+
+        all_labels = [0] * len(all_pos_scores) + [1] * len(all_neg_scores)
+        auc = metrics.roc_auc_score(all_labels, all_pos_scores + all_neg_scores)
+
+        return loss, auc
 
     def select_model(self, log_data):
-        if log_data['mr'] < self.best_mr:
+        if log_data['auc'] < self.best_metric:
             self.bad_count = 0
             torch.save(self.model, os.path.join(self.params.exp_dir, 'best_model.pth'))  # Does it overwrite or fuck with the existing file?
             logging.info('Better model found w.r.t MR. Saved it!')
-            self.best_mr = log_data['mr']
+            self.best_mr = log_data['auc']
         else:
             self.bad_count = self.bad_count + 1
             if self.bad_count > self.params.patience:
                 logging.info('Out of patience. Stopping the training loop.')
                 return False
-        self.last_mr = log_data['mr']
+        self.last_metric = log_data['auc']
         return True

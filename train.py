@@ -13,12 +13,14 @@ parser = argparse.ArgumentParser(description='TransE model')
 
 parser.add_argument("--experiment_name", type=str, default="default",
                     help="A folder with this name would be created to dump saved models and log files")
+parser.add_argument("--dataset", "-d", type=str, default="Toy",
+                    help="Dataset string")
 
-parser.add_argument("--nEpochs", type=int, default=1000,
+parser.add_argument("--nEpochs", type=int, default=100,
                     help="Learning rate of the optimizer")
-parser.add_argument("--nBatches", type=int, default=200,
+parser.add_argument("--nBatches", type=int, default=25,
                     help="Batch size")
-parser.add_argument("--eval_every", type=int, default=25,
+parser.add_argument("--eval_every", type=int, default=10,
                     help="Interval of epochs to evaluate the model?")
 parser.add_argument("--save_every", type=int, default=50,
                     help="Interval of epochs to save a checkpoint of the model?")
@@ -63,33 +65,31 @@ else:
 
 logging.info(params.device)
 
-train_data_sampler = DataSampler(TRAIN_DATA_PATH, ALL_DATA_PATH, params.nBatches, params.debug)
-valid_data_sampler = DataSampler(VALID_DATA_PATH, ALL_DATA_PATH)
+data_sampler = DataSampler(params)
 transE = initialize_model(params)
-trainer = Trainer(transE, train_data_sampler, params)
-evaluator = Evaluator(transE, valid_data_sampler, params)
+trainer = Trainer(transE, data_sampler, params)
+evaluator = Evaluator(transE, data_sampler, params)
 
-batch_size = int(len(train_data_sampler.data) / params.nBatches)
-logging.info('Starting training with batch size = %d' % batch_size)
+logging.info('Starting training...')
 
 # tb_logger = Logger(params.exp_dir)
 
 for e in range(params.nEpochs):
     res = 0
     tic = time.time()
-    for b in range(params.nBatches):
-        loss = trainer.one_step(b)
-        res += loss
+    transE.train()
+    loss, auc = trainer.one_epoch()
     toc = time.time()
 
     # tb_logger.scalar_summary('loss', loss, e)
 
-    logging.info('Epoch %d with loss: %f in %f'
-                 % (e, res, toc - tic))
+    logging.info('Epoch %d with loss: %f, AUC: %f in %f'
+                 % (e, loss, auc, toc - tic))
 
     if (e + 1) % params.eval_every == 0:
         tic = time.time()
-        log_data = evaluator.get_log_data(params.eval_mode)
+        transE.eval()
+        log_data = evaluator.get_log_data('test')
         toc = time.time()
         logging.info('Performance: %s in %f' % (str(log_data), (toc - tic)))
 
