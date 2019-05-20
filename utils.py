@@ -58,9 +58,9 @@ def initialize_experiment(params):
         json.dump(vars(params), fout)
 
 
-def initialize_model(params):
+def initialize_model(params, load_model=False):
 
-    if os.path.exists(os.path.join(params.exp_dir, 'best_model.pth')):
+    if load_model and os.path.exists(os.path.join(params.exp_dir, 'best_model.pth')):
         logging.info('Loading existing model from %s' % os.path.join(params.exp_dir, 'best_model.pth'))
         model = torch.load(os.path.join(params.exp_dir, 'best_model.pth'))
     else:
