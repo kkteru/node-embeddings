@@ -23,14 +23,14 @@ class Evaluator():
     def get_log_data(self, data='valid'):
 
         if data == 'valid':
-            eval_batch_h, eval_batch_t, eval_batch_r = self.data_sampler.get_valid_data()
+            eval_batch_h, eval_batch_t, eval_batch_r, eval_batch_y = self.data_sampler.get_valid_data()
         elif data == 'test':
-            eval_batch_h, eval_batch_t, eval_batch_r = self.data_sampler.get_test_data()
+            eval_batch_h, eval_batch_t, eval_batch_r, eval_batch_y = self.data_sampler.get_test_data()
 
-        score = self.model(eval_batch_h, eval_batch_t, eval_batch_r)
+        _, pos_scores, neg_scores = self.model(eval_batch_h, eval_batch_t, eval_batch_r, eval_batch_y)
 
-        all_pos_scores = score[0: int(len(score) / 2)].detach().cpu().tolist()
-        all_neg_scores = score[int(len(score) / 2): len(score)].detach().cpu().tolist()
+        all_pos_scores = pos_scores.detach().cpu().tolist()
+        all_neg_scores = neg_scores.detach().cpu().tolist()
 
         all_labels = [0] * len(all_pos_scores) + [1] * len(all_neg_scores)
         auc = metrics.roc_auc_score(all_labels, all_pos_scores + all_neg_scores)

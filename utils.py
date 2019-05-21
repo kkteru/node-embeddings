@@ -9,7 +9,7 @@ import scipy.misc
 from io import BytesIO
 
 
-from core import TransE
+from core import TransE, DistMult, ComplEx
 
 FALSY_STRINGS = {'off', 'false', '0'}
 TRUTHY_STRINGS = {'on', 'true', '1'}
@@ -65,7 +65,12 @@ def initialize_model(params, load_model=False):
         model = torch.load(os.path.join(params.exp_dir, 'best_model.pth'))
     else:
         logging.info('No existing model found. Initializing new model..')
-        model = TransE(params).to(device=params.device)
+        if params.model == 'TransE':
+            model = TransE(params).to(device=params.device)
+        if params.model == 'DistMult':
+            model = DistMult(params).to(device=params.device)
+        if params.model == 'ComplEx':
+            model = ComplEx(params).to(device=params.device)
 
     return model
 

@@ -32,17 +32,13 @@ class Trainer():
         all_neg_scores = []
         total_loss = 0
         for b in range(self.params.nBatches):
-            batch_h, batch_t, batch_r = self.data.get_batch(b)
-            score = self.model(batch_h, batch_t, batch_r)
-
-            pos_score = score[0: int(len(score) / 2)]
-            neg_score = score[int(len(score) / 2): len(score)]
+            batch_h, batch_t, batch_r, batch_y = self.data.get_batch(b)
+            loss, pos_score, neg_score = self.model(batch_h, batch_t, batch_r, batch_y)
 
             all_pos_scores += pos_score.detach().cpu().tolist()
             all_neg_scores += neg_score.detach().cpu().tolist()
 
-            loss = self.criterion(pos_score, neg_score, torch.Tensor([-1]).to(device=self.params.device))
-            total_loss += loss
+            total_loss += loss.detach().cpu()
 
             self.optimizer.zero_grad()
             loss.backward()
@@ -51,7 +47,7 @@ class Trainer():
         all_labels = [0] * len(all_pos_scores) + [1] * len(all_neg_scores)
         auc = metrics.roc_auc_score(all_labels, all_pos_scores + all_neg_scores)
 
-        return loss, auc
+        return total_loss, auc
 
     def select_model(self, log_data):
         if log_data['auc'] < self.best_metric:

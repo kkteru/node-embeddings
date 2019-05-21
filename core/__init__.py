@@ -5,3 +5,5 @@ and allows for clean import rather than dumping all imports in one file.
 
 from .DataSampler import DataSampler
 from .TransE import TransE
+from .DistMult import DistMult
+from .ComplEx import ComplEx

@@ -15,6 +15,8 @@ parser.add_argument("--experiment_name", type=str, default="default",
                     help="A folder with this name would be created to dump saved models and log files")
 parser.add_argument("--dataset", "-d", type=str, default="Toy",
                     help="Dataset string")
+parser.add_argument("--model", "-m", type=str, default="TransE",
+                    help="Model to use")
 
 parser.add_argument("--nEpochs", type=int, default=100,
                     help="Learning rate of the optimizer")
@@ -43,6 +45,8 @@ parser.add_argument("--lr", type=float, default=0.01,
                     help="Learning rate of the optimizer")
 parser.add_argument("--momentum", type=float, default=0,
                     help="Momentum of the SGD optimizer")
+parser.add_argument("--lmbda", type=float, default=0,
+                    help="Regularization constant")
 
 parser.add_argument("--debug", type=bool_flag, default=False,
                     help="Run the code in debug mode?")

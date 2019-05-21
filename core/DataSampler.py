@@ -52,8 +52,8 @@ def sample_neg(adj_list, train_triplets, valid_triplets, test_triplets, max_trai
         else:
             continue
     train_neg = (np.array(neg[0][:train_num]), np.array(neg[1][:train_num]), np.array(neg[2][:train_num]))
-    valid_neg = (np.array(neg[0][train_num:valid_num]), np.array(neg[1][train_num:valid_num]), np.array(neg[2][train_num:valid_num]))
-    test_neg = (np.array(neg[0][valid_num:]), np.array(neg[1][valid_num:]), np.array(neg[2][valid_num:]))
+    valid_neg = (np.array(neg[0][train_num:train_num + valid_num]), np.array(neg[1][train_num:train_num + valid_num]), np.array(neg[2][train_num:train_num + valid_num]))
+    test_neg = (np.array(neg[0][train_num + valid_num:]), np.array(neg[1][train_num + valid_num:]), np.array(neg[2][train_num + valid_num:]))
     return train_pos, train_neg, valid_pos, valid_neg, test_pos, test_neg
 
 
@@ -87,21 +87,24 @@ class DataSampler():
         batch_h = np.concatenate((self.train_pos[0][ids], self.train_neg[0][ids]))
         batch_t = np.concatenate((self.train_pos[1][ids], self.train_neg[1][ids]))
         batch_r = np.concatenate((self.train_pos[2][ids], self.train_neg[2][ids]))
+        batch_y = np.concatenate((np.ones(self.batch_size), -1 * np.ones(self.batch_size)))
 
-        return batch_h, batch_t, batch_r
+        return batch_h, batch_t, batch_r, batch_y
 
     def get_valid_data(self):
 
         batch_h = np.concatenate((self.valid_pos[0], self.valid_neg[0]))
         batch_t = np.concatenate((self.valid_pos[1], self.valid_neg[1]))
         batch_r = np.concatenate((self.valid_pos[2], self.valid_neg[2]))
+        batch_y = np.concatenate((np.ones(len(self.valid_pos[0])), -1 * np.ones(len(self.valid_neg[0]))))
 
-        return batch_h, batch_t, batch_r
+        return batch_h, batch_t, batch_r, batch_y
 
     def get_test_data(self):
 
         batch_h = np.concatenate((self.test_pos[0], self.test_neg[0]))
         batch_t = np.concatenate((self.test_pos[1], self.test_neg[1]))
         batch_r = np.concatenate((self.test_pos[2], self.test_neg[2]))
+        batch_y = np.concatenate((np.ones(len(self.test_pos[0])), -1 * np.ones(len(self.test_neg[0]))))
 
-        return batch_h, batch_t, batch_r
+        return batch_h, batch_t, batch_r, batch_y
